@@ -8,6 +8,7 @@ import { Share as ShareModel } from "../../../../api/explorer.ts";
 import { closeShareLinkDialog } from "../../../../redux/globalStateSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks.ts";
 import { createOrUpdateShareLink } from "../../../../redux/thunks/share.ts";
+import SessionManager, { UserSettings } from "../../../../session";
 import { copyToClipboard, sendLink } from "../../../../util";
 import AutoHeight from "../../../Common/AutoHeight.tsx";
 import { FilledTextField, SmallFormControlLabel } from "../../../Common/StyledComponents.tsx";
@@ -92,11 +93,11 @@ const ShareDialog = () => {
       if (editTarget) {
         setSetting(shareToSetting(editTarget, t));
       } else {
-        setSetting(initialSetting);
+        setSetting({ ...initialSetting, ...SessionManager.getWithFallback(UserSettings.SharePreferences) });
       }
       setShareLink("");
     }
-  }, [open]);
+  }, [open, editTarget, t]);
 
   const onClose = useCallback(() => {
     if (!loading) {
@@ -119,6 +120,15 @@ const ShareDialog = () => {
 
       setLoading(true);
       try {
+        if (!editTarget) {
+          const { expires_val, downloads_val, ...preferences } = setting;
+          SessionManager.set(UserSettings.SharePreferences, {
+            ...preferences,
+            expires_val: setting.expires ? expires_val : expireOptions[2],
+            downloads_val: setting.downloads ? downloads_val : downloadOptions[0],
+          });
+        }
+        
         const shareLink = await dispatch(
           createOrUpdateShareLink(FileManagerIndex.main, target, setting, editTarget?.id),
         );

@@ -32,6 +32,7 @@ export enum UserSettings {
   GalleryWidth = "gallery_width",
   UploadOverwrite = "upload_overwrite",
   TimeZone = "time_zone",
+  SharePreferences = "share_preferences",
 }
 
 export const UserSettingsDefault: { [key: string]: any } = {
@@ -61,6 +62,12 @@ export const UserSettingsDefault: { [key: string]: any } = {
   [UserSettings.GalleryWidth]: 220,
   [UserSettings.UploadOverwrite]: false,
   [UserSettings.TimeZone]: "Asia/Shanghai",
+  [UserSettings.SharePreferences]: {
+    is_private: true,
+    share_view: true,
+    expires: false,
+    downloads: false,
+  },
 };
 
 export interface Session extends LoginResponse {
