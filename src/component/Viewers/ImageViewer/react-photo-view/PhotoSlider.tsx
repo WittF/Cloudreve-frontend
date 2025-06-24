@@ -121,12 +121,17 @@ export default function PhotoSlider(props: IPhotoSliderProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // 添加中等屏幕尺寸检测，与其他组件保持一致
+  const isMediumScreen = useMediaQuery("(max-width: 730px) and (min-width: 600px)");
   const dispatch = useAppDispatch();
   const containerRef = useRef(null);
   const sideBarOpen = useAppSelector((state) => state.globalState.sidebarOpen);
   const [state, updateState] = useSetState(initialState);
   const [innerIndex, updateInnerIndex] = useState(0);
-  const dynamicInnerWidth = sideBarOpen ? window.innerWidth - 300 : window.innerWidth;
+  
+  // 计算动态侧边栏宽度，与侧边栏组件保持一致
+  const sidebarWidth = isMediumScreen ? 200 : 300;
+  const dynamicInnerWidth = sideBarOpen ? window.innerWidth - sidebarWidth : window.innerWidth;
 
   const {
     x,
@@ -395,7 +400,7 @@ export default function PhotoSlider(props: IPhotoSliderProps) {
           !visible ? " PhotoView-Slider__willClose" : ""
         }${className ? ` ${className}` : ""}`}
         style={{
-          width: sideBarOpen ? "calc(100% - 300px)" : "100%",
+          width: sideBarOpen ? `calc(100% - ${sidebarWidth}px)` : "100%",
         }}
         role="dialog"
         onClick={(e) => e.stopPropagation()}

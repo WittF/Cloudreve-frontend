@@ -57,27 +57,46 @@ export const DrawerPopover = (props: PopoverProps) => {
 };
 
 const AppDrawer = () => {
-  const theme = useTheme();
   const open = useAppSelector((state) => state.globalState.drawerOpen);
+  const mobileDrawerOpen = useAppSelector((state) => state.globalState.mobileDrawerOpen);
   const drawerWidth = useAppSelector((state) => state.globalState.drawerWidth);
+  const dispatch = useAppDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery("(max-width: 730px) and (min-width: 600px)");
   const appBarBg = theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900];
+  
+  const effectiveDrawerWidth = isMediumScreen ? Math.min(drawerWidth, 160) : drawerWidth;
 
   return (
     <Drawer
       sx={{
-        width: drawerWidth,
+        width: effectiveDrawerWidth,
         flexShrink: 0,
         display: "flex",
+        // 添加宽度过渡动画，与项目中其他组件保持一致
+        transition: (theme) => theme.transitions.create(["width"], {
+          easing: theme.transitions.easing.easeInOut,
+          duration: theme.transitions.duration.standard,
+        }),
         "& .MuiDrawer-paper": {
-          width: drawerWidth,
+          width: effectiveDrawerWidth,
           boxSizing: "border-box",
           backgroundColor: appBarBg,
           borderRight: "initial",
+          // 为抽屉纸张组件也添加宽度过渡动画
+          transition: (theme) => theme.transitions.create(["width"], {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.standard,
+          }),
         },
       }}
-      variant="persistent"
+      variant={isMobile ? "temporary" : "persistent"}
       anchor="left"
-      open={open}
+      open={isMobile ? mobileDrawerOpen : open}
+      onClose={() => {
+        dispatch({ type: "globalState/setMobileDrawerOpen", payload: false });
+      }}
     >
       <DrawerContent />
     </Drawer>

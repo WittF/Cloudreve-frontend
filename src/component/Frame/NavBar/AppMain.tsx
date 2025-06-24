@@ -33,12 +33,15 @@ const AppMain = () => {
   let navigation = useNavigation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery("(max-width: 730px) and (min-width: 600px)");
   const pageVariant = useContext(PageVariantContext);
   const isDashboard = pageVariant == PageVariant.dashboard;
   const user = SessionManager.currentLoginOrNull();
   const isAdmin = useMemo(() => {
     return GroupBS(user?.user).enabled(GroupPermission.is_admin);
   }, [user?.user?.group?.permission]);
+
+  const effectiveDrawerWidth = isMediumScreen ? Math.min(drawerWidth, 160) : drawerWidth;
 
   useEffect(() => {
     const handleResize = () => {
@@ -57,7 +60,7 @@ const AppMain = () => {
           duration: theme.transitions.duration.leavingScreen,
         }),
         marginRight: isMobile ? 0 : 2,
-        marginLeft: isMobile ? 0 : `-${drawerWidth - 16}px`,
+        marginLeft: isMobile ? 0 : `-${effectiveDrawerWidth - 16}px`,
         ...(open && {
           transition: theme.transitions.create("margin", {
             easing: theme.transitions.easing.easeOut,

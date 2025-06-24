@@ -26,6 +26,8 @@ const TopAppBar = () => {
   const theme = useTheme();
   const pageVariant = useContext(PageVariantContext);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // 添加中等屏幕尺寸检测
+  const isMediumScreen = useMediaQuery("(max-width: 730px) and (min-width: 600px)");
   const isMainPage = pageVariant == PageVariant.default;
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -37,6 +39,9 @@ const TopAppBar = () => {
 
   const appBarBg = theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900];
   const isLogin = !!SessionManager.currentLoginOrNull();
+  
+  // 在中等屏幕尺寸时使用更小的抽屉宽度
+  const effectiveDrawerWidth = isMediumScreen ? Math.min(drawerWidth, 160) : drawerWidth;
 
   const onMobileMenuClicked = (e: React.MouseEvent<HTMLElement>) => {
     setMobileMenuAnchor(e.currentTarget);
@@ -61,8 +66,8 @@ const TopAppBar = () => {
         color: theme.palette.getContrastText(appBarBg),
         ...(open &&
           !isMobile && {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: `${drawerWidth}px`,
+            width: `calc(100% - ${effectiveDrawerWidth}px)`,
+            marginLeft: `${effectiveDrawerWidth}px`,
             transition: theme.transitions.create(["margin", "width"], {
               easing: theme.transitions.easing.easeOut,
               duration: theme.transitions.duration.enteringScreen,

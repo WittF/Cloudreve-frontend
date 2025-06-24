@@ -1,5 +1,6 @@
 import { grey } from "@mui/material/colors";
 import React, { useEffect, useRef } from "react";
+import { useMediaQuery, useTheme } from "@mui/material";
 import { useInView } from "react-intersection-observer";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks.ts";
 import { loadMorePages } from "../../../../redux/thunks/filemanager.ts";
@@ -187,7 +188,13 @@ export default function PhotoBox({
   } = state;
 
   const sideBarOpen = useAppSelector((state) => state.globalState.sidebarOpen);
-  const dynamicInnerWidth = sideBarOpen ? window.innerWidth - 300 : window.innerWidth;
+  // 添加中等屏幕尺寸检测，与其他组件保持一致
+  const theme = useTheme();
+  const isMediumScreen = useMediaQuery("(max-width: 730px) and (min-width: 600px)");
+  
+  // 计算动态侧边栏宽度，与侧边栏组件保持一致
+  const sidebarWidth = isMediumScreen ? 200 : 300;
+  const dynamicInnerWidth = sideBarOpen ? window.innerWidth - sidebarWidth : window.innerWidth;
 
   const fn = useMethods({
     onScale: (current: number) => onScale(limitScale(current)),
